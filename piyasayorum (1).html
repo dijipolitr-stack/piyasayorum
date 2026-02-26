@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PiyasaYorum — Ekonomi & Borsa Analizi</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Source+Serif+4:wght@300;400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f0f0f;
+    --paper: #f5f0e8;
+    --cream: #ede8dc;
+    --red: #c0392b;
+    --gold: #b8942a;
+    --green: #1a7a4a;
+    --border: #2a2a2a;
+    --muted: #6b6560;
+    --col: 1fr;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* SON DAKİKA BANDI */
+  .breaking-band {
+    background: var(--red);
+    color: white;
+    padding: 8px 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    border-bottom: 3px solid #8b1a12;
+  }
+
+  .breaking-label {
+    background: #8b1a12;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    padding: 4px 16px;
+    white-space: nowrap;
+    margin-right: 20px;
+    flex-shrink: 0;
+  }
+
+  .breaking-ticker {
+    overflow: hidden;
+    flex: 1;
+  }
+
+  .breaking-ticker-inner {
+    display: flex;
+    gap: 60px;
+    animation: ticker 40s linear infinite;
+    white-space: nowrap;
+  }
+
+  .breaking-ticker-inner span {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .breaking-ticker-inner span::before {
+    content: "◆ ";
+    opacity: 0.7;
+  }
+
+  @keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* BORSA TICKER */
+  .market-bar {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 10px 24px;
+    display: flex;
+    gap: 32px;
+    align-items: center;
+    overflow-x: auto;
+    scrollbar-width: none;
+    border-bottom: 2px solid var(--gold);
+  }
+
+  .market-bar::-webkit-scrollbar { display: none; }
+
+  .market-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .market-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #aaa;
+  }
+
+  .market-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--paper);
+  }
+
+  .market-change {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 2px;
+  }
+
+  .up { color: #2ecc71; }
+  .down { color: #e74c3c; }
+  .up-bg { background: rgba(46,204,113,0.15); color: #2ecc71; }
+  .down-bg { background: rgba(231,76,60,0.15); color: #e74c3c; }
+
+  .market-divider {
+    width: 1px;
+    height: 20px;
+    background: #333;
+    flex-shrink: 0;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: 4px double var(--border);
+    padding: 0 24px;
+  }
+
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0 8px;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .header-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .header-tagline {
+    font-family: 'Source Serif 4', serif;
+    font-size: 11px;
+    font-style: italic;
+    color: var(--muted);
+  }
+
+  .header-main {
+    text-align: center;
+    padding: 20px 0 16px;
+    position: relative;
+  }
+
+  .site-name {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(48px, 8vw, 88px);
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1;
+    color: var(--ink);
+    text-transform: uppercase;
+  }
+
+  .site-name span {
+    color: var(--red);
+  }
+
+  .site-subtitle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--muted);
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+
+  .header-rule {
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 12px 0 0;
+  }
+
+  /* NAVİGASYON */
+  nav {
+    background: var(--ink);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  nav::-webkit-scrollbar { display: none; }
+
+  nav a {
+    color: var(--paper);
+    text-decoration: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 14px 20px;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+  }
+
+  nav a:hover, nav a.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+
+  .nav-search {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .nav-search input {
+    background: #222;
+    border: 1px solid #444;
+    color: var(--paper);
+    padding: 6px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    border-radius: 2px;
+    width: 180px;
+    outline: none;
+  }
+
+  .nav-search input:focus {
+    border-color: var(--gold);
+  }
+
+  .nav-search input::placeholder { color: #666; }
+
+  .search-btn {
+    background: var(--gold);
+    border: none;
+    color: var(--ink);
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 2px;
+    font-size: 13px;
+  }
+
+  /* ANA İÇERİK */
+  main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  /* MANŞET ALANI */
+  .front-page {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 0;
+    border: 1px solid #ccc;
+    margin-bottom: 32px;
+  }
+
+  .main-story {
+    padding: 28px;
+    border-right: 1px solid #ccc;
+    position: relative;
+  }
+
+  .story-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .story-eyebrow::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--red);
+    opacity: 0.3;
+  }
+
+  .main-headline {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(26px, 3vw, 42px);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .main-headline:hover { color: var(--red); }
+
+  .main-image {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    display: block;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+  }
+
+  .main-deck {
+    font-size: 16px;
+    line-height: 1.7;
+    color: #333;
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .story-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    padding-top: 16px;
+    border-top: 1px solid #ddd;
+  }
+
+  .sentiment-badge {
+    padding: 3px 10px;
+    border-radius: 2px;
+    font-weight: 600;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .badge-pozitif { background: rgba(26,122,74,0.12); color: var(--green); border: 1px solid rgba(26,122,74,0.3); }
+  .badge-negatif { background: rgba(192,57,43,0.12); color: var(--red); border: 1px solid rgba(192,57,43,0.3); }
+  .badge-notr { background: rgba(107,101,96,0.12); color: var(--muted); border: 1px solid rgba(107,101,96,0.3); }
+
+  .side-stories {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .side-story {
+    padding: 0;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+    transition: background 0.2s;
+    overflow: hidden;
+  }
+
+  .side-story:last-child { border-bottom: none; }
+  .side-story:hover { background: var(--cream); }
+
+  .side-story-img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    display: block;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .side-story-content {
+    padding: 14px 20px;
+  }
+
+  .side-headline {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+
+  .side-deck {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* HABER GRID */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid var(--ink);
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 22px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: #ccc;
+  }
+
+  .section-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .news-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 1px solid #ccc;
+    margin-bottom: 40px;
+  }
+
+  .card-img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    display: block;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 0;
+  }
+
+  .card-content {
+    padding: 16px;
+  }
+
+  .news-card {
+    padding: 0;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+    transition: background 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .news-card:hover { background: var(--cream); }
+  .news-card:nth-child(3n) { border-right: none; }
+
+  .card-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .card-headline {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 10px;
+  }
+
+  .card-summary {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: #aaa;
+    letter-spacing: 0.5px;
+    padding-top: 10px;
+    border-top: 1px solid #e8e3d8;
+  }
+
+  /* HABER DETAY MODALİ */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15,15,15,0.85);
+    z-index: 1000;
+    overflow-y: auto;
+    padding: 40px 20px;
+  }
+
+  .modal-overlay.open { display: flex; justify-content: center; }
+
+  .modal {
+    background: var(--paper);
+    max-width: 780px;
+    width: 100%;
+    border: 1px solid #ccc;
+    position: relative;
+    animation: slideUp 0.3s ease;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .modal-header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 20px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .modal-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--gold);
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--paper);
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+
+  .modal-close:hover { opacity: 1; }
+
+  .modal-body {
+    padding: 32px 28px;
+  }
+
+  .modal-img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    display: block;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 28px;
+  }
+
+  .modal-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .modal-headline {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+
+  .modal-meta {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    padding: 12px 0;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .modal-section-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    margin-top: 24px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .modal-text {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #222;
+    margin-bottom: 16px;
+  }
+
+  .modal-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #ddd;
+  }
+
+  .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 4px 10px;
+    border: 1px solid #ccc;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .tag:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  .modal-source-link {
+    display: inline-block;
+    margin-top: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--red);
+    text-decoration: none;
+    border-bottom: 1px solid var(--red);
+    padding-bottom: 2px;
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 32px 24px 20px;
+    margin-top: 40px;
+  }
+
+  .footer-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #333;
+    margin-bottom: 20px;
+  }
+
+  .footer-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--paper);
+    margin-bottom: 10px;
+  }
+
+  .footer-brand span { color: var(--gold); }
+
+  .footer-desc {
+    font-size: 12px;
+    color: #888;
+    line-height: 1.7;
+  }
+
+  .footer-col-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+  }
+
+  .footer-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .footer-links a {
+    color: #aaa;
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--paper); }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: #555;
+    letter-spacing: 0.5px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .front-page { grid-template-columns: 1fr; }
+    .side-stories { flex-direction: row; overflow-x: auto; }
+    .side-story { min-width: 260px; border-right: 1px solid #ccc; border-bottom: none; }
+    .news-grid { grid-template-columns: repeat(2, 1fr); }
+    .news-card:nth-child(3n) { border-right: 1px solid #ccc; }
+    .news-card:nth-child(2n) { border-right: none; }
+    .footer-top { grid-template-columns: 1fr; gap: 24px; }
+  }
+
+  @media (max-width: 600px) {
+    .news-grid { grid-template-columns: 1fr; }
+    .market-bar { gap: 20px; }
+    main { padding: 16px; }
+  }
+
+  /* PULSE ANİMASYON */
+  .live-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    margin-right: 6px;
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .loading-shimmer {
+    background: linear-gradient(90deg, #e8e3d8 25%, #f0ebe0 50%, #e8e3d8 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 2px;
+    height: 14px;
+    margin-bottom: 8px;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SON DAKİKA BANDI -->
+<div class="breaking-band">
+  <div class="breaking-label"><span class="live-dot"></span>SON DAKİKA</div>
+  <div class="breaking-ticker">
+    <div class="breaking-ticker-inner" id="breakingTicker">
+      <span>TCMB politika faizini sabit tuttu</span>
+      <span>BIST100 günü 9.450 puanla kapattı</span>
+      <span>Dolar/TL kuru 32,45 seviyesinde seyrediyor</span>
+      <span>Altın ons fiyatı rekor kırdı</span>
+      <span>Enflasyon verileri açıklandı</span>
+      <span>SPK yeni düzenleme paketini duyurdu</span>
+      <span>TCMB politika faizini sabit tuttu</span>
+      <span>BIST100 günü 9.450 puanla kapattı</span>
+      <span>Dolar/TL kuru 32,45 seviyesinde seyrediyor</span>
+      <span>Altın ons fiyatı rekor kırdı</span>
+      <span>Enflasyon verileri açıklandı</span>
+      <span>SPK yeni düzenleme paketini duyurdu</span>
+    </div>
+  </div>
+</div>
+
+<!-- BORSA TICKER -->
+<div class="market-bar">
+  <div class="market-item">
+    <span class="market-name">BIST100</span>
+    <span class="market-value">9.452,18</span>
+    <span class="market-change up-bg">+%1,24</span>
+  </div>
+  <div class="market-divider"></div>
+  <div class="market-item">
+    <span class="market-name">BIST30</span>
+    <span class="market-value">10.831,45</span>
+    <span class="market-change up-bg">+%0,98</span>
+  </div>
+  <div class="market-divider"></div>
+  <div class="market-item">
+    <span class="market-name">USD/TRY</span>
+    <span class="market-value">32,4520</span>
+    <span class="market-change down-bg">-%0,12</span>
+  </div>
+  <div class="market-divider"></div>
+  <div class="market-item">
+    <span class="market-name">EUR/TRY</span>
+    <span class="market-value">35,1840</span>
+    <span class="market-change down-bg">-%0,08</span>
+  </div>
+  <div class="market-divider"></div>
+  <div class="market-item">
+    <span class="market-name">ALTIN (gr)</span>
+    <span class="market-value">2.847,50</span>
+    <span class="market-change up-bg">+%0,65</span>
+  </div>
+  <div class="market-divider"></div>
+  <div class="market-item">
+    <span class="market-name">BTC/USD</span>
+    <span class="market-value">68.420</span>
+    <span class="market-change up-bg">+%2,31</span>
+  </div>
+  <div class="market-divider"></div>
+  <div class="market-item">
+    <span class="market-name">THYAO</span>
+    <span class="market-value">285,60</span>
+    <span class="market-change up-bg">+%3,12</span>
+  </div>
+  <div class="market-divider"></div>
+  <div class="market-item">
+    <span class="market-name">AKBNK</span>
+    <span class="market-value">42,18</span>
+    <span class="market-change down-bg">-%0,47</span>
+  </div>
+  <div class="market-divider"></div>
+  <div class="market-item">
+    <span class="market-name">EREGL</span>
+    <span class="market-value">47,82</span>
+    <span class="market-change up-bg">+%1,58</span>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-top">
+    <span class="header-date" id="currentDate"></span>
+    <span class="header-tagline">Piyasaları yorumluyoruz — Her gün, her saat</span>
+  </div>
+  <div class="header-main">
+    <div class="site-name">Piyasa<span>Yorum</span></div>
+    <div class="site-subtitle">Ekonomi · Borsa · Yatırım · Girişim</div>
+  </div>
+  <div class="header-rule"></div>
+</header>
+
+<!-- NAVİGASYON -->
+<nav>
+  <a href="#" class="active">Tümü</a>
+  <a href="#">Borsa</a>
+  <a href="#">Ekonomi</a>
+  <a href="#">Yatırım</a>
+  <a href="#">Girişim</a>
+  <a href="#">Piyasalar</a>
+  <a href="#">Analiz</a>
+  <a href="#">Günlük Rapor</a>
+  <div class="nav-search">
+    <input type="text" placeholder="Haber ara...">
+    <button class="search-btn">⌕</button>
+  </div>
+</nav>
+
+<!-- ANA İÇERİK -->
+<main>
+
+  <!-- MANŞET -->
+  <div class="front-page" id="frontPage">
+    <div class="main-story">
+      <div class="story-eyebrow">Manşet</div>
+      <img class="main-image" src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900&q=80" alt="TCMB Faiz Kararı">
+      <h1 class="main-headline" onclick="openModal(0)">TCMB Faiz Kararı: Piyasalar Yeni Döneme Hazırlanıyor</h1>
+      <p class="main-deck">Merkez Bankası'nın son faiz kararı sonrası Türk lirası değer kazandı, BIST100 rekor yakınına geldi. Analistler önümüzdeki döneme ilişkin değerlendirmelerini paylaştı.</p>
+      <div class="story-meta">
+        <span class="sentiment-badge badge-pozitif">● Pozitif</span>
+        <span>BloombergHT</span>
+        <span>25 Şub 2026, 14:32</span>
+        <span>BIST · TL · FAİZ</span>
+      </div>
+    </div>
+    <div class="side-stories">
+      <div class="side-story" onclick="openModal(1)">
+        <img class="side-story-img" src="https://images.unsplash.com/photo-1543286386-713bdd548da4?w=600&q=80" alt="Enflasyon">
+        <div class="side-story-content">
+          <div class="card-tag">Ekonomi</div>
+          <div class="side-headline">Enflasyon Verisi Beklentilerin Altında Kaldı</div>
+          <div class="side-deck">TÜİK açıkladı: Aylık enflasyon %2,8 ile tahminlerin gerisinde...</div>
+        </div>
+      </div>
+      <div class="side-story" onclick="openModal(2)">
+        <img class="side-story-img" src="https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=600&q=80" alt="Startup">
+        <div class="side-story-content">
+          <div class="card-tag">Girişim</div>
+          <div class="side-headline">Türk Teknoloji Startupı 50 Milyon Dolar Yatırım Aldı</div>
+          <div class="side-deck">Fintech alanında faaliyet gösteren şirket Seri B turunu kapattı...</div>
+        </div>
+      </div>
+      <div class="side-story" onclick="openModal(3)">
+        <img class="side-story-img" src="https://images.unsplash.com/photo-1610375461369-d613b564f4c4?w=600&q=80" alt="Altın">
+        <div class="side-story-content">
+          <div class="card-tag">Piyasalar</div>
+          <div class="side-headline">Altın Fiyatları Yeni Zirveyi Test Ediyor</div>
+          <div class="side-deck">Ons altın 2.900 doların üzerine çıktı, gram altın rekor kırdı...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HABER LİSTESİ -->
+  <div class="section-header">
+    <div class="section-title">Son Haberler</div>
+    <div class="section-line"></div>
+    <div class="section-count" id="newsCount">YÜKLENİYOR...</div>
+  </div>
+
+  <div class="news-grid" id="newsGrid">
+    <!-- Haberler buraya gelecek -->
+  </div>
+
+</main>
+
+<!-- HABER DETAY MODALİ -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <span class="modal-label">◆ HABERİN TAM ANALİZİ</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-brand">Piyasa<span>Yorum</span></div>
+      <p class="footer-desc">Türkiye'nin finans, borsa ve ekonomi dünyasını yapay zeka destekli analizlerle yorumlayan bağımsız haber platformu.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Kategoriler</div>
+      <ul class="footer-links">
+        <li><a href="#">Borsa Haberleri</a></li>
+        <li><a href="#">Ekonomi Analizi</a></li>
+        <li><a href="#">Yatırım Rehberi</a></li>
+        <li><a href="#">Girişim Dünyası</a></li>
+        <li><a href="#">Günlük Rapor</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Kurumsal</div>
+      <ul class="footer-links">
+        <li><a href="#">Hakkımızda</a></li>
+        <li><a href="#">İletişim</a></li>
+        <li><a href="#">Gizlilik Politikası</a></li>
+        <li><a href="#">Yasal Uyarı</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 PiyasaYorum. Tüm hakları saklıdır.</span>
+    <span>Yapay Zeka Destekli Haber Analizi</span>
+  </div>
+</footer>
+
+<script>
+  // Tarih
+  const d = new Date();
+  const days = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+  const months = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  document.getElementById('currentDate').textContent = 
+    `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+
+  const SHEET_ID = '1DmeMMagkk9Y3yXEb7jKa8ncgumOk61SptlCQ6Wenf3s';
+  const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Sheet1`;
+
+  // Kategori görselleri (haber görseli yoksa konuya göre otomatik seç)
+  const kategoriGorselleri = {
+    'Borsa': 'https://images.unsplash.com/photo-1535320903710-d993d3d77d29?w=900&q=80',
+    'Ekonomi': 'https://images.unsplash.com/photo-1543286386-713bdd548da4?w=900&q=80',
+    'Yatırım': 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900&q=80',
+    'Girişim': 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=900&q=80',
+    'Piyasalar': 'https://images.unsplash.com/photo-1610375461369-d613b564f4c4?w=900&q=80',
+    'default': 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=900&q=80'
+  };
+
+  function gorselSec(kategori, sentiment) {
+    return kategoriGorselleri[kategori] || kategoriGorselleri['default'];
+  }
+
+  let haberler = [];
+
+  async function sheetstenYukle() {
+    // Yükleniyor göster
+    document.getElementById('newsGrid').innerHTML = `
+      <div style="grid-column:1/-1;padding:60px;text-align:center;color:#888;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;">
+        ◆ HABERLER YÜKLENİYOR...
+      </div>`;
+
+    try {
+      const res = await fetch(SHEET_URL);
+      const text = await res.text();
+
+      // Google'ın garip JSON formatını temizle
+      const json = JSON.parse(text.replace('/*O_o*/', '').replace('google.visualization.Query.setResponse(', '').slice(0, -2));
+
+      const rows = json.table.rows;
+      const cols = json.table.cols.map(c => c.label.toLowerCase());
+
+      haberler = rows
+        .filter(row => row.c && row.c[cols.indexOf('durum')] && 
+                row.c[cols.indexOf('durum')].v === 'ready')
+        .map(row => {
+          const get = (key) => {
+            const i = cols.indexOf(key);
+            return i >= 0 && row.c[i] ? (row.c[i].v || '') : '';
+          };
+
+          const kategori = get('kategori') || 'Ekonomi';
+          const etiketlerRaw = get('etiketler');
+          let etiketler = [];
+          try {
+            etiketler = JSON.parse(etiketlerRaw.replace(/'/g, '"'));
+          } catch {
+            etiketler = etiketlerRaw ? etiketlerRaw.split(',').map(e => e.trim()) : [];
+          }
+
+          return {
+            baslik: get('baslik'),
+            ozet: get('ozet') || 'Detay için tıklayın.',
+            yorum: get('yorum') || '',
+            sentiment: get('sentiment') || 'nötr',
+            kaynak: get('kaynak') || 'Haber Kaynağı',
+            tarih: get('tarih') || '',
+            url: get('url') || '#',
+            gorsel: gorselSec(kategori, get('sentiment')),
+            etiketler: etiketler,
+            kategori: kategori
+          };
+        })
+        .filter(h => h.baslik); // boş başlıkları at
+
+      if (haberler.length === 0) {
+        document.getElementById('newsGrid').innerHTML = `
+          <div style="grid-column:1/-1;padding:60px;text-align:center;color:#888;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;">
+            ◆ HENÜZ HABER YOK — n8n workflow'u çalıştırın
+          </div>`;
+        document.getElementById('newsCount').textContent = '0 HABER';
+        return;
+      }
+
+      renderHaberler();
+      renderMAnset();
+
+    } catch (err) {
+      console.error(err);
+      document.getElementById('newsGrid').innerHTML = `
+        <div style="grid-column:1/-1;padding:60px;text-align:center;color:#c0392b;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;">
+          ◆ BAĞLANTI HATASI — Sheets herkese açık mı? (${err.message})
+        </div>`;
+    }
+  }
+
+  // Manşeti güncelle
+  function renderMAnset() {
+    if (haberler.length === 0) return;
+    const h = haberler[0];
+    document.querySelector('.main-image').src = h.gorsel;
+    document.querySelector('.main-headline').textContent = h.baslik;
+    document.querySelector('.main-headline').onclick = () => openModal(0);
+    document.querySelector('.main-deck').textContent = h.ozet;
+
+    // Yan haberler
+    const sidestories = document.querySelectorAll('.side-story');
+    [1, 2, 3].forEach((i, idx) => {
+      if (haberler[i] && sidestories[idx]) {
+        const sh = haberler[i];
+        sidestories[idx].onclick = () => openModal(i);
+        sidestories[idx].querySelector('.side-story-img').src = sh.gorsel;
+        sidestories[idx].querySelector('.card-tag').textContent = sh.kategori;
+        sidestories[idx].querySelector('.side-headline').textContent = sh.baslik;
+        sidestories[idx].querySelector('.side-deck').textContent = sh.ozet.substring(0, 80) + '...';
+      }
+    });
+  }
+
+  // Haberleri grid'e render et
+  // (canlı veri sheetstenYukle() ile geliyor)
+  const _placeholder = [
+    {
+      baslik: "TCMB Faiz Kararı: Piyasalar Yeni Döneme Hazırlanıyor",
+      ozet: "Merkez Bankası'nın son faiz kararı sonrası Türk lirası değer kazandı, BIST100 rekor yakınına geldi.",
+      yorum: "Türkiye Cumhuriyet Merkez Bankası'nın (TCMB) politika faizini sabit tutma kararı, piyasalarda olumlu karşılandı. Karar öncesinde temkinli bir seyir izleyen BIST100 endeksi, açıklamanın ardından yükseliş trendine girdi.\n\nAnalistler, bu kararın enflasyonla mücadelede kararlılık mesajı verdiğini ve yatırımcı güvenini pekiştirdiğini vurguluyor. Özellikle bankacılık ve finans sektörü hisselerinde belirgin artışlar gözlemlendi.\n\nYabancı yatırımcıların Türk varlıklarına olan ilgisinin arttığı bu süreçte, TL'deki değer kazancı ihracatçıları temkinli tutarken ithalatçı şirketler için olumlu bir gelişme olarak değerlendiriliyor. Önümüzdeki dönemde TCMB'nin enflasyon verileri ışığında adımlarını şekillendireceği beklentisi ağırlık kazanıyor.",
+      sentiment: "pozitif",
+      kaynak: "BloombergHT",
+      tarih: "25 Şub 2026, 14:32",
+      url: "https://www.bloomberght.com/",
+      gorsel: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900&q=80",
+      etiketler: ["TCMB", "Faiz", "BIST", "TL", "Enflasyon"],
+      kategori: "Ekonomi"
+    },
+    {
+      baslik: "Enflasyon Verisi Beklentilerin Altında Kaldı",
+      ozet: "TÜİK açıkladı: Aylık enflasyon %2,8 ile tahminlerin gerisinde gerçekleşti.",
+      yorum: "TÜİK'in açıkladığı aylık enflasyon verisi, piyasa beklentilerinin altında gerçekleşerek pozitif bir sürpriz yarattı. %3,5 beklentisine karşılık %2,8 olarak açıklanan rakam, enflasyonla mücadelede somut bir ilerlemeye işaret ediyor.\n\nGıda fiyatlarındaki yavaşlama ve enerji maliyetlerindeki göreceli istikrar, bu olumlu tablonun temel belirleyicileri oldu. Hizmet sektörü enflasyonunun ise ısınmaya devam ettiği görülüyor.\n\nBorsada savunma hisselerinde kar satışları yaşanırken, büyümeye duyarlı sektörler öne çıktı. TCMB'nin önümüzdeki toplantısında faiz indirimine gidebileceği spekülasyonları güç kazandı.",
+      sentiment: "pozitif",
+      kaynak: "Dünya Gazetesi",
+      tarih: "25 Şub 2026, 11:15",
+      url: "https://www.dunya.com/",
+      gorsel: "https://images.unsplash.com/photo-1543286386-713bdd548da4?w=900&q=80",
+      etiketler: ["Enflasyon", "TÜİK", "TCMB", "Ekonomi"],
+      kategori: "Ekonomi"
+    },
+    {
+      baslik: "Türk Teknoloji Startupı 50 Milyon Dolar Yatırım Aldı",
+      ozet: "Fintech alanında faaliyet gösteren şirket Seri B turunu uluslararası yatırımcılardan kapattı.",
+      yorum: "İstanbul merkezli fintech girişimi, yurt dışı odaklı büyüme hedefiyle çıktığı Seri B yatırım turunu 50 milyon dolar ile başarıyla tamamladı. Turda Orta Doğu ve Avrupa'dan tanınmış risk sermayesi fonları yer aldı.\n\nŞirket, bu yatırımı ürün geliştirme, yeni pazarlara açılma ve nitelikli istihdam artışı için kullanmayı planlıyor. Türkiye'nin girişim ekosistemi açısından gurur verici bu gelişme, uluslararası yatırımcıların Türk teknoloji şirketlerine olan ilgisinin somut bir göstergesi.\n\nFintech sektörünün Türkiye'deki büyüme hikayesi devam ederken, bu tur benzer aşamadaki diğer girişimlere de yatırımcı ilgisini artırabilir.",
+      sentiment: "pozitif",
+      kaynak: "Investing TR",
+      tarih: "25 Şub 2026, 09:45",
+      url: "https://tr.investing.com/",
+      gorsel: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=900&q=80",
+      etiketler: ["Girişim", "Fintech", "Yatırım", "Startup"],
+      kategori: "Girişim"
+    },
+    {
+      baslik: "Altın Fiyatları Yeni Zirveyi Test Ediyor",
+      ozet: "Ons altın 2.900 doların üzerine çıktı, jeopolitik belirsizlikler talebi destekliyor.",
+      yorum: "Küresel jeopolitik gerilimler ve merkez bankalarının altın alımlarını sürdürmesi, ons fiyatını 2.900 doların üzerine taşıdı. Gram altın da Türkiye'de tarihî yüksek seviyelerde seyrediyor.\n\nAltının bu yükselişi, küresel risk iştahındaki azalmanın yanı sıra Dolar Endeksi'ndeki zayıflamayla da destekleniyor. Fiziksel altın talebinde Asya kaynaklı güçlü bir alım dalgası gözlemleniyor.\n\nYatırımcılar için altın, mevcut konjonktürde portföy çeşitlendirmesinin kritik bir bileşeni olmaya devam ediyor. Teknik analistler, 3.000 dolar hedefinin gündemde kalmaya devam ettiğini vurguluyor.",
+      sentiment: "pozitif",
+      kaynak: "BloombergHT",
+      tarih: "25 Şub 2026, 08:20",
+      url: "https://www.bloomberght.com/",
+      gorsel: "https://images.unsplash.com/photo-1610375461369-d613b564f4c4?w=900&q=80",
+      etiketler: ["Altın", "Piyasalar", "Yatırım", "Jeopolitik"],
+      kategori: "Piyasalar"
+    },
+    {
+      baslik: "Borsa İstanbul'da Yabancı Yatırımcı Çıkışı Hızlandı",
+      ozet: "Son iki haftada 280 milyon dolarlık yabancı satışı gerçekleşti, endeks baskı altında.",
+      yorum: "Borsa İstanbul'da yabancı yatırımcıların portföy azaltma sürecini hızlandırdığı gözlemleniyor. İki haftalık süreçte yaklaşık 280 milyon dolarlık net satış yapıldı.\n\nBu çıkışın arkasında küresel risk iştahındaki daralma, Fed'in faiz politikasına ilişkin belirsizlik ve Türkiye'ye özgü siyasi gündem faktörleri yer alıyor. Banka ve holding hisseleri satış baskısının en yoğun hissedildiği alanlar oldu.\n\nYerli bireysel yatırımcılar ise bu süreçte net alıcı konumunda yer alarak endeksteki kayıpları sınırlandırıyor. Uzmanlar, kısa vadede volatilitenin yüksek kalabileceğini, ancak orta vadede değerleme cazibesinin yabancı ilgisini yeniden çekebileceğini belirtiyor.",
+      sentiment: "negatif",
+      kaynak: "Dünya Gazetesi",
+      tarih: "25 Şub 2026, 07:55",
+      url: "https://www.dunya.com/",
+      gorsel: "https://images.unsplash.com/photo-1535320903710-d993d3d77d29?w=900&q=80",
+      etiketler: ["BIST", "Yabancı Yatırımcı", "Borsa", "Endeks"],
+      kategori: "Borsa"
+    },
+    {
+      baslik: "Konut Kredisi Faizleri Yeniden Geriledi",
+      ozet: "Kamu bankaları konut kredisi faizlerini 100-150 baz puan indirdi, talep artışı bekleniyor.",
+      yorum: "Kamu bankalarının öncülüğünde başlayan konut kredisi faiz indirimi dalgası, sektördeki talebi canlandırma potansiyeli taşıyor. İndirimler sonrasında ortalama kredi faizi %3,20 seviyesine geriledi.\n\nGayrimenkul sektörü temsilcileri, bu gelişmenin durma noktasına gelen konut satışlarını yeniden hareketlendireceğini öngörüyor. Özellikle büyük şehirlerde birincil konut alımlarında artış beklentisi güçlendi.\n\nÖte yandan, faiz indirimine karşın konut fiyatlarının yüksek seyrini koruması, erişilebilirlik sorununu gündemde tutmaya devam ediyor. Yatırım amaçlı alımlarda ise kira getirisi hesaplamaları belirleyici olmaya devam edecek.",
+      sentiment: "pozitif",
+      kaynak: "BloombergHT",
+      tarih: "24 Şub 2026, 18:10",
+      url: "https://www.bloomberght.com/",
+      gorsel: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=900&q=80",
+      etiketler: ["Konut", "Kredi", "Faiz", "Gayrimenkul"],
+      kategori: "Ekonomi"
+    }
+  ];
+
+  // Haberleri render et
+  function renderHaberler() {
+    const grid = document.getElementById('newsGrid');
+    const count = document.getElementById('newsCount');
+    count.textContent = `${haberler.length} HABER`;
+
+    grid.innerHTML = haberler.map((h, i) => `
+      <div class="news-card" onclick="openModal(${i})">
+        <img class="card-img" src="${h.gorsel}" alt="${h.baslik}" loading="lazy" onerror="this.style.display='none'">
+        <div class="card-content">
+          <div class="card-tag">${h.kategori}</div>
+          <div class="card-headline">${h.baslik}</div>
+          <div class="card-summary">${h.ozet}</div>
+          <div class="card-footer">
+            <span class="sentiment-badge badge-${h.sentiment}">● ${h.sentiment.charAt(0).toUpperCase() + h.sentiment.slice(1)}</span>
+            <span>${h.tarih}</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Modal aç
+  function openModal(index) {
+    const h = haberler[index];
+    const body = document.getElementById('modalBody');
+    body.innerHTML = `
+      <img class="modal-img" src="${h.gorsel}" alt="${h.baslik}" onerror="this.style.display='none'">
+      <div class="modal-eyebrow">${h.kategori} · ${h.kaynak}</div>
+      <h2 class="modal-headline">${h.baslik}</h2>
+      <div class="modal-meta">
+        <span class="sentiment-badge badge-${h.sentiment}">● ${h.sentiment.charAt(0).toUpperCase() + h.sentiment.slice(1)}</span>
+        <span>${h.tarih}</span>
+        <span>${h.kaynak}</span>
+      </div>
+      <div class="modal-section-title">Özet</div>
+      <p class="modal-text">${h.ozet}</p>
+      <div class="modal-section-title">Piyasa Analizi</div>
+      ${(h.yorum||'').split('\n\n').map(p => `<p class="modal-text">${p}</p>`).join('')}
+      <div class="modal-tags">
+        ${(h.etiketler||[]).map(e => `<span class="tag">#${e}</span>`).join('')}
+      </div>
+      <a href="${h.url}" target="_blank" class="modal-source-link">→ Kaynağa Git: ${h.kaynak}</a>
+    `;
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Modal kapat
+  function closeModal(e) {
+    if (!e || e.target === document.getElementById('modalOverlay')) {
+      document.getElementById('modalOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  }
+
+  // Klavye ile kapat
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  // 🚀 BAŞLAT — Google Sheets'ten gerçek haberleri yükle, her 5 dk yenile
+  sheetstenYukle();
+  setInterval(sheetstenYukle, 5 * 60 * 1000);
+</script>
+
+</body>
+</html>
