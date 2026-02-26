@@ -1030,14 +1030,22 @@
       const json = JSON.parse(text.replace('/*O_o*/', '').replace('google.visualization.Query.setResponse(', '').slice(0, -2));
 
       const rows = json.table.rows;
-      const cols = json.table.cols.map(c => c.label.toLowerCase());
+      const cols = json.table.cols.map(c => (c.label || '').toLowerCase().trim());
+
+      const durumIdx = cols.indexOf('durum');
 
       haberler = rows
-        .filter(row => row.c && row.c[cols.indexOf('durum')] && 
-                row.c[cols.indexOf('durum')].v === 'ready')
+        .filter(row => {
+          if (!row.c) return false;
+          if (durumIdx < 0) return true;
+          const durumCell = row.c[durumIdx];
+          if (!durumCell) return false;
+          const durumVal = (durumCell.v || '').toString().trim().toLowerCase();
+          return durumVal === 'ready';
+        })
         .map(row => {
           const get = (key) => {
-            const i = cols.indexOf(key);
+            const i = cols.indexOf(key.toLowerCase().trim());
             return i >= 0 && row.c[i] ? (row.c[i].v || '') : '';
           };
 
