@@ -1074,7 +1074,13 @@
             kategori: kategori
           };
         })
-        .filter(h => h.baslik); // boş başlıkları at
+        .filter(h => h.baslik) // boş başlıkları at
+        .sort((a, b) => {
+          // En yeni haber önce gelsin
+          const dateA = new Date(a.tarih || 0);
+          const dateB = new Date(b.tarih || 0);
+          return dateB - dateA;
+        });
 
       if (haberler.length === 0) {
         document.getElementById('newsGrid').innerHTML = `
